@@ -29,7 +29,6 @@ def _validate_columns(kpi_name: str, df: pd.DataFrame, required_columns: tuple[s
             f"KPI {kpi_name} requer {missing_columns}, que não foram encontradas no dataset."
         )
 
-# decorator
 def with_column_validation(kpi_name, required_columns):
     def decorator(fn):
         @wraps(fn)
@@ -41,7 +40,7 @@ def with_column_validation(kpi_name, required_columns):
 
 
 @with_column_validation(
-        kpi_name="time survey administration",
+        kpi_name="time_survey_administration",
         required_columns=("Submitted at")
 )
 def _time_survey_administration(df):
@@ -64,15 +63,15 @@ def _time_survey_administration(df):
     week_group.name = "submissions"
 
     return {
-        "days untill now ": days_till_now, 
-        "weeks untill now": weeks_till_now,
-        "submissions by day": day_group,
-        "submissions by weeks": week_group
+        "days_until_now": days_till_now, 
+        "weeks_until_now": weeks_till_now,
+        "submissions_by_day": day_group,
+        "submissions_by_week": week_group
         }
 
 
 @with_column_validation(
-        kpi_name="submissions groupped by city",
+        kpi_name="submissions_grouped_by_city",
         required_columns=("Selecione o seu município")
 )
 def _survey_responses_by_city(df):
@@ -81,11 +80,11 @@ def _survey_responses_by_city(df):
     city_group.index.name = "city"
     city_group.name = "submissions"
 
-    return {"submissions by city": city_group}
+    return {"submissions_by_city": city_group}
 
 
 @with_column_validation(
-        kpi_name="vag and cadunico distribution",
+        kpi_name="vag_and_cadunico_distribution",
         required_columns=(
             "Você é inscrito no programa CadÚnico?",
             "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
@@ -112,14 +111,14 @@ def _vag_cadunico(df):
     cadunico_vag = (cond_q1 & cond_q5 & cond_q6).sum()
 
     return {
-        "beneficiaries on vag": int(vag),
-        "beneficiaries registered on cadunico": int(cadunico),
-        "beneficiaries registered on cadunico on vag": int(cadunico_vag)
+        "beneficiaries_on_vag": int(vag),
+        "beneficiaries_registered_on_cadunico": int(cadunico),
+        "beneficiaries_registered_on_cadunico_on_vag": int(cadunico_vag)
     }
 
 
 @with_column_validation(
-        kpi_name="beneficiaries consistency of access",
+        kpi_name="beneficiaries_consistency_of_access",
         required_columns=(
             "Você é inscrito no programa CadÚnico?",
             "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
@@ -148,13 +147,13 @@ def _consistenfy_of_access(df):
         ]).size().sort_index()
 
     return {
-        "beneficiaries on vag consistency of access": vag_consistency,
-        "beneficiaries NOT on vag consistency of access": not_vag_consistency
+        "beneficiaries_on_vag_consistency_of_access": vag_consistency,
+        "beneficiaries_not_on_vag_consistency_of_access": not_vag_consistency
     }
 
 
 @with_column_validation(
-        kpi_name="program dependency",
+        kpi_name="program_dependency",
         required_columns=(
             "Sem o programa Tá Na Mesa, você continua se alimentando normalmente?",
             "Contando com a refeição distribuída pelo programa Tá Na Mesa, quantas refeições você faz por dia?"
@@ -185,14 +184,14 @@ def _program_dependency(df):
     dependents_on_vag = ((cond_q9  & cond_q10) & (cond_q5 & cond_q6)).sum()
     
     return {
-        "program dependents": int(dependents),
-        "program NOT dependents": int(not_dependents),
-        "program dependents on vag": int(dependents_on_vag)
+        "program_dependents": int(dependents),
+        "program_not_dependents": int(not_dependents),
+        "program_dependents_on_vag": int(dependents_on_vag)
     }
 
 
 @with_column_validation(
-        kpi_name="families dependency",
+        kpi_name="families_dependency",
         required_columns=(
             "Quantas pessoas moram com você?",
             "As refeições do programa Tá Na Mesa servem todas as pessoas da sua casa?"
@@ -213,13 +212,13 @@ def _assisted_families(df):
         ]).size().sort_index()
 
     return {
-        "residence program serving": family_serving,
-        "entire served family configurantion": families_tot_served_config
+        "residence_program_serving": family_serving,
+        "entire_served_family_configuration": families_tot_served_config
     }
 
 
 @with_column_validation(
-        kpi_name="difficulty of access",
+        kpi_name="difficulty_of_access",
         required_columns=(
             "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
             "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?",    
@@ -258,14 +257,14 @@ def _local_access(df):
         ).size().sort_index()
 
     return  {
-        "beneficiaries on vag by difficulty of access": vag_by_difficulty_of_access,
-        "difficulty of access by region (urban)": acces_urban_region,
-        "difficulty of access by region (rural)": acces_rural_region
+        "beneficiaries_on_vag_by_difficulty_of_access": vag_by_difficulty_of_access,
+        "difficulty_of_access_urban_region": acces_urban_region,
+        "difficulty_of_access_rural_region": acces_rural_region
     }
 
 
 @with_column_validation(
-        kpi_name="beneficiaries queue awaiting",
+        kpi_name="beneficiaries_queue_awaiting",
         required_columns=(
             "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
             "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?",    
@@ -292,15 +291,15 @@ def _beneficiaries_not_eating(df):
     not_vag_not_eating = len(df[( (~(cond_q5 & cond_q6)) & (cond_q22) )])
 
     return {
-        "await and eat": eating,
-        "await and NOT eat": not_eating,
-        "await and NOT eat on vag": vag_not_eating,
-        "await and NOT eat NOT on vag": not_vag_not_eating
+        "await_and_eat": eating,
+        "await_and_not_eat": not_eating,
+        "await_and_not_eat_on_vag": vag_not_eating,
+        "await_and_not_eat_not_on_vag": not_vag_not_eating
     }
 
 
 @with_column_validation(
-        kpi_name="menu sugestion",
+        kpi_name="menu_suggestion",
         required_columns=(
             "Você já tentou sugerir alguma mudança ao cardápio do restaurante?",
             "Quando você não gosta do cardápio do dia, o que você faz com a refeição?",
@@ -328,16 +327,16 @@ def _restaurant_menu(df):
     ).size().sort_index()
 
     return {
-        "menu change sugestions": menu_sugestion,
-        "daily menu realization": daily_menu_realization,
-        "menu variety": varied_menu,
-        "menu satisfaction": menu_satisfaction,
-        "when beneficiary didnt like the food served": action_if_dont_like_food
+        "menu_change_suggestions": menu_sugestion,
+        "daily_menu_realization": daily_menu_realization,
+        "menu_variety": varied_menu,
+        "menu_satisfaction": menu_satisfaction,
+        "action_when_beneficiary_dislikes_food": action_if_dont_like_food
     }
 
 
 @with_column_validation(
-        kpi_name="restaurant operationalization",
+        kpi_name="restaurant_operationalization",
         required_columns=(
             "Você sabe quantas refeições o restaurante pode servir todo dia?",
             "A pessoa que recebe o seu pagamento também entrega a sua refeição ao mesmo tempo?",
@@ -357,14 +356,14 @@ def _restaurant_op(df):
     ]).size().sort_index()
 
     return {
-        "Beneficiary knows maximun dairy food served": bene_knows_food_qtt,
-        "Payment and serving separation": payment_serving_separation,
-        "restaurant program signposted": restaurant_program_signposted
+        "beneficiary_knows_maximum_daily_food_served": bene_knows_food_qtt,
+        "payment_and_serving_separation": payment_serving_separation,
+        "restaurant_program_signposted": restaurant_program_signposted
     }
 
 
 @with_column_validation(
-        kpi_name="restaurant cleaning",
+        kpi_name="restaurant_cleaning",
         required_columns=(
             "Em relação à limpeza do restaurante, qual a sua opinião?"
         )
@@ -372,13 +371,13 @@ def _restaurant_op(df):
 def _restaurant_cleaning(df):
 
     return {
-        "restaurant cleaning":
+        "restaurant_cleaning":
         df.groupby(df["Em relação à limpeza do restaurante, qual a sua opinião?"]).size().sort_index()
     }
 
 
 @with_column_validation(
-        kpi_name="cold food",
+        kpi_name="cold_food",
         required_columns=(
             "Você já recebeu sua refeição fria?"
         )
@@ -386,13 +385,13 @@ def _restaurant_cleaning(df):
 def _cold_food(df):
 
     return {
-        "cold food":
+        "cold_food":
         df.groupby(df["Você já recebeu sua refeição fria?"]).size().sort_index()
     }
 
 
 @with_column_validation(
-        kpi_name="package integrity",
+        kpi_name="package_integrity",
         required_columns=(
             "Você já recebeu refeições servidas em embalagens danificadas ou sujas?"
         )
@@ -400,7 +399,7 @@ def _cold_food(df):
 def _packaging_integrity(df):
 
     return {
-        "package integrity":
+        "package_integrity":
         df.groupby(df[
             "Você já recebeu refeições servidas em embalagens danificadas ou sujas?"
             ]).size().sort_index()
@@ -408,7 +407,7 @@ def _packaging_integrity(df):
 
 
 @with_column_validation(
-        kpi_name="food integrity",
+        kpi_name="food_integrity",
         required_columns=(
             "Você já percebeu alguma refeição estragada?"
         )
@@ -416,7 +415,7 @@ def _packaging_integrity(df):
 def _food_integrity(df):
     
     return {
-        "food integrity":
+        "food_integrity":
         df.groupby(df[
             "Você já percebeu alguma refeição estragada?"
         ]).size().sort_index()
@@ -424,7 +423,7 @@ def _food_integrity(df):
 
 
 @with_column_validation(
-        kpi_name="time on queue",
+        kpi_name="time_on_queue",
         required_columns=(
             "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
             "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?",
@@ -458,15 +457,15 @@ def _time_on_queue(df):
     not_vag_not_waiting = len(df[( (~(cond_q5 & cond_q6)) & (cond_q20) )])
 
     return {
-        "average time on queue": (sum/len(df))*60,
-        "time on queue":
+        "average_time_on_queue": (sum/len(df))*60,
+        "time_on_queue":
             time_on_queue.size().sort_index(),
-        "beneficiaries not waiting on vag": vag_not_waiting,
-        "beneficiaries not waiting not on vag": not_vag_not_waiting
+        "beneficiaries_not_waiting_on_vag": vag_not_waiting,
+        "beneficiaries_not_waiting_not_on_vag": not_vag_not_waiting
     }
 
 @with_column_validation(
-        kpi_name="difficulty on waiting for food",
+        kpi_name="difficulty_on_waiting_for_food",
         required_columns=(
             "Você sente alguma dificuldade enquanto espera pela sua refeição?"
         )
@@ -474,13 +473,13 @@ def _time_on_queue(df):
 def _difficulty_on_waiting(df):
 
     return {
-        "difficulty on waiting":
+        "difficulty_on_waiting":
             df.groupby(df["Você sente alguma dificuldade enquanto espera pela sua refeição?"]).size().sort_index()
     }
 
 
 @with_column_validation(
-        kpi_name="difficulty on waiting for food",
+        kpi_name="program_review",
         required_columns=(
             "Para uma única pessoa, a quantidade de comida das refeições é suficiente?",
             "A quantidade de carne, frango ou peixe servida nas refeições é suficiente?",
@@ -508,10 +507,10 @@ def _program_review(df):
     ).size().sort_index()
 
     return {
-        "food quantity review": food_qtt,
-        "protein quantity review": protein_qtt,
-        "food flavor review": food_flavor,
-        "program satisfaction review": program_satisfaction,
+        "food_quantity_review": food_qtt,
+        "protein_quantity_review": protein_qtt,
+        "food_flavor_review": food_flavor,
+        "program_satisfaction_review": program_satisfaction,
         "program_continuity": program_continuity
     }
 
