@@ -218,8 +218,305 @@ def _assisted_families(df):
     }
 
 
+@with_column_validation(
+        kpi_name="difficulty of access",
+        required_columns=(
+            "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
+            "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?",    
+            "Você mora na zona urbana da cidade ou na zona rural da cidade?",
+            "Você sente que tipo de dificuldade para chegar ao restaurante?"
+        )
+)
+def _local_access(df):
+
+    cond_q6 = df[
+        "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?"
+        ].isin(["Sim, tive medo da comida acabar"])
+    cond_q5 = df[
+        "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?"
+        ].isin(["Sim, deixei de comer por falta de dinheiro"])
+
+    vag = df[(cond_q5 & cond_q6)]
+
+    vag_by_difficulty_of_access = vag.groupby(df[
+        "Você sente dificuldade para chegar ao restaurante?"
+        ]).size().sort_index()
+    
+    cond_q17 = df[
+        "Você mora na zona urbana da cidade ou na zona rural da cidade?"
+        ].isin(["Moro na zona urbana"])
+
+    urban_df = df[cond_q17]
+    rural_df = df[~cond_q17]
+
+    acces_urban_region = urban_df.groupby(
+        "Você sente que tipo de dificuldade para chegar ao restaurante?"
+        ).size().sort_index()
+
+    acces_rural_region = rural_df.groupby(
+        "Você sente que tipo de dificuldade para chegar ao restaurante?"
+        ).size().sort_index()
+
+    return  {
+        "beneficiaries on vag by difficulty of access": vag_by_difficulty_of_access,
+        "difficulty of access by region (urban)": acces_urban_region,
+        "difficulty of access by region (rural)": acces_rural_region
+    }
+
+
+@with_column_validation(
+        kpi_name="beneficiaries queue awaiting",
+        required_columns=(
+            "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
+            "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?",    
+            "Você já esperou na fila e mesmo assim ficou sem receber a refeição?"
+        )
+)
+def _beneficiaries_not_eating(df):
+
+    cond_q22 = df[
+        "Você já esperou na fila e mesmo assim ficou sem receber a refeição?"
+        ].isin(["Raramente entro na fila e não recebo a refeição", "Frequentemente entro na fila e não recebo a refeição"])
+
+    eating = len(df[~(cond_q22)])
+    not_eating = len(df[cond_q22])
+
+    cond_q6 = df[
+        "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?"
+        ].isin(["Sim, tive medo da comida acabar"])
+    cond_q5 = df[
+        "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?"
+        ].isin(["Sim, deixei de comer por falta de dinheiro"])
+
+    vag_not_eating = len(df[((cond_q5 & cond_q6) & (cond_q22))])
+    not_vag_not_eating = len(df[( (~(cond_q5 & cond_q6)) & (cond_q22) )])
+
+    return {
+        "await and eat": eating,
+        "await and NOT eat": not_eating,
+        "await and NOT eat on vag": vag_not_eating,
+        "await and NOT eat NOT on vag": not_vag_not_eating
+    }
+
+
+@with_column_validation(
+        kpi_name="menu sugestion",
+        required_columns=(
+            "Você já tentou sugerir alguma mudança ao cardápio do restaurante?",
+            "Quando você não gosta do cardápio do dia, o que você faz com a refeição?",
+            "Você já deixou de comer alguma refeição do programa Tá Na Mesa por que não gostou do cardápio do dia?",
+            "As refeições ofertadas diariamente são variadas?",
+            "Em que momento você descobre o cardápio que será servido no dia?"
+        )
+)
+def _restaurant_menu(df):
+
+    menu_sugestion = df.groupby(df["Você já tentou sugerir alguma mudança ao cardápio do restaurante?"]).size().sort_index()
+
+    daily_menu_realization = df.groupby(
+        df["Em que momento você descobre o cardápio que será servido no dia?"]).size().sort_index()
+
+    varied_menu = df.groupby(
+        df["As refeições ofertadas diariamente são variadas?"]).size().sort_index()
+
+    menu_satisfaction = df.groupby(
+        df["Você já deixou de comer alguma refeição do programa Tá Na Mesa por que não gostou do cardápio do dia?"]
+    ).size().sort_index()
+
+    action_if_dont_like_food = df.groupby(
+        "Quando você não gosta do cardápio do dia, o que você faz com a refeição?"
+    ).size().sort_index()
+
+    return {
+        "menu change sugestions": menu_sugestion,
+        "daily menu realization": daily_menu_realization,
+        "menu variety": varied_menu,
+        "menu satisfaction": menu_satisfaction,
+        "when beneficiary didnt like the food served": action_if_dont_like_food
+    }
+
+
+@with_column_validation(
+        kpi_name="restaurant operationalization",
+        required_columns=(
+            "Você sabe quantas refeições o restaurante pode servir todo dia?",
+            "A pessoa que recebe o seu pagamento também entrega a sua refeição ao mesmo tempo?",
+            "O restaurante é identificado como parte do programa Tá Na Mesa?"
+        )
+)
+def _restaurant_op(df):
+
+    bene_knows_food_qtt = df.groupby(df["Você sabe quantas refeições o restaurante pode servir todo dia?"]).size().sort_index
+
+    payment_serving_separation = df.groupby(df[
+        "A pessoa que recebe o seu pagamento também entrega a sua refeição ao mesmo tempo?"
+        ]).size().sort_index()
+
+    restaurant_program_signposted = df.groupby(df[
+        "O restaurante é identificado como parte do programa Tá Na Mesa?"
+    ]).size().sort_index()
+
+    return {
+        "Beneficiary knows maximun dairy food served": bene_knows_food_qtt,
+        "Payment and serving separation": payment_serving_separation,
+        "restaurant program signposted": restaurant_program_signposted
+    }
+
+
+@with_column_validation(
+        kpi_name="restaurant cleaning",
+        required_columns=(
+            "Em relação à limpeza do restaurante, qual a sua opinião?"
+        )
+)
+def _restaurant_cleaning(df):
+
+    return {
+        "restaurant cleaning":
+        df.groupby(df["Em relação à limpeza do restaurante, qual a sua opinião?"]).size().sort_index()
+    }
+
+
+@with_column_validation(
+        kpi_name="cold food",
+        required_columns=(
+            "Você já recebeu sua refeição fria?"
+        )
+)
+def _cold_food(df):
+
+    return {
+        "cold food":
+        df.groupby(df["Você já recebeu sua refeição fria?"]).size().sort_index()
+    }
+
+
+@with_column_validation(
+        kpi_name="package integrity",
+        required_columns=(
+            "Você já recebeu refeições servidas em embalagens danificadas ou sujas?"
+        )
+)
+def _packaging_integrity(df):
+
+    return {
+        "package integrity":
+        df.groupby(df[
+            "Você já recebeu refeições servidas em embalagens danificadas ou sujas?"
+            ]).size().sort_index()
+    }
+
+
+@with_column_validation(
+        kpi_name="food integrity",
+        required_columns=(
+            "Você já percebeu alguma refeição estragada?"
+        )
+)
+def _food_integrity(df):
+    
+    return {
+        "food integrity":
+        df.groupby(df[
+            "Você já percebeu alguma refeição estragada?"
+        ]).size().sort_index()
+    }
+
+
+@with_column_validation(
+        kpi_name="time on queue",
+        required_columns=(
+            "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?",
+            "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?",
+            #"Quanto tempo você espera na fila para receber a sua refeição?"
+        )
+)
+def _time_on_queue(df):
+
+    time_on_queue = df.groupby(df["Quanto tempo você espera na fila para receber a sua refeição?"])
+
+    sum = 0
+    for name, group in time_on_queue:
+        if "Não preciso" in name: sum += len(group)*0.25
+        if "até 30" in name: sum += len(group)*0.5
+        if "de 30" in name: sum += len(group)*0.75
+        if "de 1(uma)" in name: sum += len(group)*1.5
+        if "por mais de 2(duas)" in name: sum += len(group)
+
+    cond_q20 = df[
+        "Quanto tempo você espera na fila para receber a sua refeição?"
+    ].isin(["Não preciso esperar, recebo a refeição rapidamente"])
+
+    cond_q6 = df[
+        "Nos últimos meses, você teve medo da comida da sua casa acabar antes de ter dinheiro para comprar mais?"
+        ].isin(["Sim, tive medo da comida acabar"])
+    cond_q5 = df[
+        "Nos últimos meses, você sentiu fome e não comeu por falta de dinheiro?"
+        ].isin(["Sim, deixei de comer por falta de dinheiro"])
+
+    vag_not_waiting = len(df[((cond_q5 & cond_q6) & (cond_q20))])
+    not_vag_not_waiting = len(df[( (~(cond_q5 & cond_q6)) & (cond_q20) )])
+
+    return {
+        "average time on queue": (sum/len(df))*60,
+        "time on queue":
+            time_on_queue.size().sort_index(),
+        "beneficiaries not waiting on vag": vag_not_waiting,
+        "beneficiaries not waiting not on vag": not_vag_not_waiting
+    }
+
+@with_column_validation(
+        kpi_name="difficulty on waiting for food",
+        required_columns=(
+            "Você sente alguma dificuldade enquanto espera pela sua refeição?"
+        )
+)
+def _difficulty_on_waiting(df):
+
+    return {
+        "difficulty on waiting":
+            df.groupby(df["Você sente alguma dificuldade enquanto espera pela sua refeição?"]).size().sort_index()
+    }
+
+
+@with_column_validation(
+        kpi_name="difficulty on waiting for food",
+        required_columns=(
+            "Para uma única pessoa, a quantidade de comida das refeições é suficiente?",
+            "A quantidade de carne, frango ou peixe servida nas refeições é suficiente?",
+            "Levando em conta todas as refeições que você já recebeu durante o programa Tá Na Mesa, como você avalia o sabor das refeições?",
+            "Em relação a todo o programa Tá Na Mesa, qual o seu nível de satisfação?",
+            "Na sua opinião, o programa Tá Na Mesa precisa ser continuado? "
+        )
+)
+def _program_review(df):
+
+    food_qtt = df.groupby(
+        df["Para uma única pessoa, a quantidade de comida das refeições é suficiente?"]
+    ).size().sort_index()
+    protein_qtt = df.groupby(
+        df["A quantidade de carne, frango ou peixe servida nas refeições é suficiente?"]
+    ).size().sort_index()
+    food_flavor = df.groupby(
+        df["Levando em conta todas as refeições que você já recebeu durante o programa Tá Na Mesa, como você avalia o sabor das refeições?"]
+    ).size().sort_index()
+    program_satisfaction = df.groupby(
+        df["Em relação a todo o programa Tá Na Mesa, qual o seu nível de satisfação?"]
+    ).size().sort_index()
+    program_continuity = df.groupby(
+        df["Na sua opinião, o programa Tá Na Mesa precisa ser continuado? "]
+    ).size().sort_index()
+
+    return {
+        "food quantity review": food_qtt,
+        "protein quantity review": protein_qtt,
+        "food flavor review": food_flavor,
+        "program satisfaction review": program_satisfaction,
+        "program_continuity": program_continuity
+    }
+
 if __name__ == "__main__":
     load_dotenv(override=True)
     df=pd.read_csv(os.getenv("CLEANED_DATA_PATH"))
     
-    print(_assisted_families(df))
+    print(_time_on_queue(df))
