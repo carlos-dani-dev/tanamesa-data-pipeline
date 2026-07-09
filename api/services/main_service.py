@@ -7,3 +7,9 @@ class MainService():
     
     def time_survey_administration(self):
         return self.repo.time_survey_administration()
+    
+    def submissions_by_city(self):
+        return self.repo.submissions_by_city()
+    
+    def beneficiaries_socioechonomics_stats(self):
+        return self.repo.beneficiaries_socioechonomics_stats()

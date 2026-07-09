@@ -349,6 +349,6 @@ def _program_review(df):
 
 if __name__ == "__main__":
     load_dotenv(override=True)
-    df = pd.read_csv(os.getenv("CLEANED_DATA_PATH"))
+    df = pd.read_csv(os.getenv("CSV_PATH"))
     
     print(_time_on_queue(df))
