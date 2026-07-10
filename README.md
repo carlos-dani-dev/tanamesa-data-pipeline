@@ -86,18 +86,10 @@ Confirmado a partir do contexto fornecido e do código compartilhado:
 
 ## Como rodar o projeto localmente
 
+A API em si não pode ser disponibilizada com dados reais, em virtude da característica dos dados coletados.
 
 
-### Pré-requisitos
-
-
-### Instalação
-
-
-### Variáveis de ambiente
-
-
-### Subindo o banco e populando dados
+### Subindo o banco e populando com dados falsos
 
 
 ### Iniciando a API
@@ -130,7 +122,10 @@ Eesses métodos foram expostos como endpoints REST (rota, verbo HTTP e autentica
 
 O dashboard em Metabase foi utilizado para verificação exploratória dos dados antes da disponibilização definitiva via API — permitindo à equipe identificar insights nos dados já tratados e nortear decisões de BI de maneira antecipada. Além de compor relatórios técnicos enviados à Secretaria de Desenvolvimento Humano do Estado da Paraíba.
 
---> Providenciar instruções de acesso (URL, autenticação, dashboards específicos) não foram identificadas no repositório
+Os dados tratados estão hospedados em um PostgreSQL na plataforma Retool, que é de onde o Metabase, hospedado em um EC2 AWS, faz suas requisições e monta as visualizações de dados.
+
+Por favor, acesse em:
+[http://54.227.203.188:3000/public/dashboard/a5e20887-fad9-4ea9-8da6-2a326ac913cf](Metabase AWS EC2 hosted)
 
 ## Dados
 
@@ -142,10 +137,6 @@ O dashboard em Metabase foi utilizado para verificação exploratória dos dados
 ## Equipe e governança
 
 O desenho analítico do pipeline (hipóteses, árvore de KPI, formulário) foi construído em conjunto com uma equipe interdisciplinar composta por nutricionistas e assistentes sociais, responsável por validar as hipóteses sobre a operacionalização do programa a partir de sua expertise técnica. O responsável técnico do pipeline conduziu o levantamento de requisitos, a modelagem analítica e a implementação da coleta, tratamento, persistência e disponibilização dos dados. Nomes próprios não foram informados nesta conversa e não devem ser presumidos — **a definir**.
-
-## Roadmap / próximos passos
-
-Não há evidências, nos documentos e código compartilhados nesta conversa, de um roadmap formal ou de próximos passos definidos. Observa-se, no entanto, que nem todos os 32 KPIs da árvore analítica possuem confirmação de implementação em *views* SQL — o mapeamento completo dos KPIs restantes é um passo natural de continuidade, mas não está formalmente registrado como roadmap. **A definir.**
 
 ## Licença
 
