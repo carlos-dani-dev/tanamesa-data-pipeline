@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from .db_settings import apply_sql_views
+from api.db_settings import apply_sql_views
 
-from .routes import main_router
+from api.routes import main_router
 
 app = FastAPI(
     tittle="Tá Na Mesa form responses API",

@@ -3,8 +3,8 @@ from typing import Annotated
 from starlette import status
 from fastapi import APIRouter, Depends
 
-from ..deps import get_kpi_service
-from ..services.main_service import MainService
+from api.deps import get_kpi_service
+from api.services.main_service import MainService
 
 
 router = APIRouter(

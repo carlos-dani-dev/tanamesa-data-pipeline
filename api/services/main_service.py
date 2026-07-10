@@ -1,4 +1,4 @@
-from ..repos.main_repo import MainRepo
+from api.repos.main_repo import MainRepo
 
 
 class MainService():

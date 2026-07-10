@@ -1,18 +1,18 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from ..schemas.application_schema import (TimeSurveyApplicationResponse,
+from api.schemas.application_schema import (TimeSurveyApplicationResponse,
                                           SubmissionsByDay, SubmissionsByWeek,
                                            SubmissionsByCity, SubmissionsByCityResponse)
 
-from ..schemas.socioechonomics_schema import (BeneficiariesSocioeconomicsStats, ConsistencyOfAccessRow,
+from api.schemas.socioechonomics_schema import (BeneficiariesSocioeconomicsStats, ConsistencyOfAccessRow,
                                               ConsistencyOfAccessResponse, ProgramDependencyRow, ProgramDependencyResponse,
                                               EntireServedFamilyConfiguration, AssistedFamiliesResponse, DifficultyOfAccessByRegion,
                                               LocalAccessResponse, BeneficiariesNotEatingStats, ResidenceProgramServing)
 
-from ..schemas.restaurants_schema import (TimeOnQueueRow, TimeOnQueueResponse, RestaurantMenuStats, RestaurantInfrastructureStats)
+from api.schemas.restaurants_schema import (TimeOnQueueRow, TimeOnQueueResponse, RestaurantMenuStats, RestaurantInfrastructureStats)
 
-from ..schemas.programReview_schema import (ProgramReviewStats)
+from api.schemas.programReview_schema import (ProgramReviewStats)
 
 
 class MainRepo:
